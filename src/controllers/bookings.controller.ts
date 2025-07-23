@@ -125,11 +125,11 @@ export const createBooking = async (
       }).exec();
     }
 
-    await sendNotification(
-      patientId,
-      "Your booking has been confirmed.",
-      "booking confirmation"
-    );
+    // await sendNotification(
+    //   patientId,
+    //   "Your booking has been confirmed.",
+    //   "booking confirmation"
+    // );
 
     // // 🕑 Optional: Cron Reminder (comment out if timing issue persists)
     // const reminderTime = moment(date).subtract(1, "hour").toDate();
