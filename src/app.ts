@@ -3,8 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import path from "path";
-import { connectDB, disconnectDB } from "./config/DataBase";
-import { cleanupCronJobs } from "./controllers/bookings.controller";
+import { connectDB } from "./config/DataBase";
 
 // Middleware handlers
 import notFound from "./middlewares/notFound";
@@ -66,37 +65,7 @@ app.use(errorHandler);
 
 // Start server
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
 });
-
-// Graceful shutdown handling
-const gracefulShutdown = async (signal: string) => {
-  console.log(`\n🛑 Received ${signal}. Starting graceful shutdown...`);
-
-  // Stop accepting new connections
-  server.close(() => {
-    console.log('✅ HTTP server closed');
-  });
-
-  // Cleanup cron jobs
-  cleanupCronJobs();
-  console.log('✅ Cron jobs cleaned up');
-
-  // Disconnect database
-  try {
-    await disconnectDB();
-    console.log('✅ Database disconnected');
-  } catch (error) {
-    console.error('❌ Error disconnecting database:', error);
-  }
-
-  // Exit process
-  process.exit(0);
-};
-
-// Handle shutdown signals
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
 export default app;
