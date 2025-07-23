@@ -9,7 +9,13 @@ const MONGODB_URI =
 
 export const connectDB = async (): Promise<void> => {
   try {
-    const conn = await mongoose.connect(MONGODB_URI);
+    const conn = await mongoose.connect(MONGODB_URI, {
+      maxPoolSize: 10, // Limit connection pool
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      bufferCommands: false, // Disable mongoose buffering
+      // bufferMaxEntries: 0, // Disable mongoose buffering
+    });
 
     console.log(` MongoDB Connected: ${conn.connection.host}`);
     console.log(` Database: ${conn.connection.name}`);
