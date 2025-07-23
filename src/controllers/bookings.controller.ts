@@ -8,6 +8,9 @@ import Physio from "../models/Physiotherapist";
 import Labs from "../models/Lab";
 import { sendNotification } from "../utils/sendNotification";
 
+// Store cron jobs for cleanup
+const activeCronJobs = new Map<string, any>();
+
 // ✅ Get all bookings
 export const getAllBookings = async (
   _req: Request,
@@ -131,24 +134,35 @@ export const createBooking = async (
       "booking confirmation"
     );
 
-    // 🕑 Optional: Cron Reminder (comment out if timing issue persists)
+    // 🕑 Fixed: Cron Reminder with proper cleanup
     const reminderTime = moment(date).subtract(1, "hour").toDate();
-    cron.schedule(
-      `${reminderTime.getMinutes()} ${reminderTime.getHours()} ${reminderTime.getDate()} ${
-        reminderTime.getMonth() + 1
-      } *`,
-      async () => {
-        try {
-          await sendNotification(
-            patientId,
-            "Reminder: Your booking is in 1 hour.",
-            "reminder"
-          );
-        } catch (err) {
-          console.error("Reminder job failed", err);
+    const cronJobId = `booking-${newBooking._id}-${reminderTime.getTime()}`;
+
+    // Only schedule if reminder time is in the future
+    if (reminderTime > new Date()) {
+      const cronJob = cron.schedule(
+        `${reminderTime.getMinutes()} ${reminderTime.getHours()} ${reminderTime.getDate()} ${reminderTime.getMonth() + 1
+        } *`,
+        async () => {
+          try {
+            await sendNotification(
+              patientId,
+              "Reminder: Your booking is in 1 hour.",
+              "reminder"
+            );
+          } catch (err) {
+            console.error("Reminder job failed", err);
+          } finally {
+            // Clean up the job after execution
+            activeCronJobs.delete(cronJobId);
+          }
         }
-      }
-    );
+      );
+
+      // Store the job reference for potential cleanup
+      activeCronJobs.set(cronJobId, cronJob);
+      cronJob.start();
+    }
 
     res
       .status(201)
@@ -236,4 +250,12 @@ export const deleteBooking = async (
   } catch (error) {
     next(error);
   }
+};
+
+// Add cleanup function for cron jobs
+export const cleanupCronJobs = () => {
+  activeCronJobs.forEach((job, id) => {
+    job.stop();
+    activeCronJobs.delete(id);
+  });
 };
