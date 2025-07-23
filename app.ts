@@ -6,8 +6,8 @@ import patientRouter from "./src/routes/PatientRouter";
 import reviewRoutes from "./src/routes/ReviewRouter";
 import { connectDB } from "./src/config/DataBase";
 import favoriteRouter from "./src/routes/FavoriteRouter";
-import bookingRouter from "../newnewnweONCall/src/routes/bookingsRoutes";
-import appointmentsRoutes from "../newnewnweONCall/src/routes/appointmentsRoutes";
+import bookingRouter from "./src/routes/bookingsRoutes"
+import appointmentsRoutes from "./src/routes/appointmentsRoutes";
 
 dotenv.config();
 
