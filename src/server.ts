@@ -14,9 +14,16 @@ const connectDB = async () => {
   }
 };
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
-connectDB();
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 OnCall API Server is running at: http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ Error during DB connection or startup:", err);
+    process.exit(1);
+  });

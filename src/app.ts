@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import path from "path";
-import { connectDB } from "./config/DataBase";
+// import { connectDB } from "./config/DataBase";
 
 // Middleware handlers
 import notFound from "./middlewares/notFound";
@@ -22,10 +22,10 @@ import callRoutes from "./routes/callRoutes";
 import medicalReportRoutes from "./routes/medicalReportRoutes";
 import prescriptionRoutes from "./routes/prescriptionRoutes";
 import authRouter from "./routes/AuthRouter";
-import dependentsRoutes from "../src/routes/dependentsRoutes";
+import dependentsRoutes from "./routes/dependentsRoutes";
 import router from "./routes/AuthRouter";
 dotenv.config();
-connectDB();
+// connectDB();
 
 const app = express();
 
@@ -63,9 +63,9 @@ app.use("/api/prescriptions", prescriptionRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-});
+// // Start server
+// const PORT = process.env.PORT || 5000;
+// app.listen(PORT, () => {
+//   console.log(`🚀 Server is running on port ${PORT}`);
+// });
 export default app;
